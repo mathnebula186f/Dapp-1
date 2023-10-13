@@ -9,15 +9,20 @@ App = {
   },
 
   initWeb3: function () {
+    console.log("there");
     // TODO: refactor conditional
     if (typeof web3 !== "undefined") {
+      console.log("Hi");
       // If a web3 instance is already provided by Meta Mask.
-      App.web3Provider = web3.currentProvider;
-      web3 = new Web3(web3.currentProvider);
+      App.web3Provider = window.ethereum;
+      
+      web3 = new Web3(window.ethereum);
+      console.log("here si the info " + App.web3Provider);
     } else {
       // Specify default instance if no web3 instance provided
+      console.log("Here");
       App.web3Provider = new Web3.providers.HttpProvider(
-        "http://localhost:7545"
+        "http://localhost:7545" 
       );
       web3 = new Web3(App.web3Provider);
     }
@@ -69,9 +74,11 @@ App = {
 
     // Load account data
     web3.eth.getCoinbase(function (err, account) {
-      if (err === null) {
-        App.account = account;
-        $("#accountAddress").html("Your Account: " + account);
+      if (window.ethereum) {
+        ethereum.enable().then(function (acc) {
+          App.account = acc[0];
+          $("#accountAddress").html("Your Account: " + App.account);
+        });
       }
     });
 
@@ -111,18 +118,23 @@ App = {
             candidatesSelect.append(candidateOption);
           });
         }
+        console.log("wait")
+        console.log(App.account)
         return electionInstance.voters(App.account);
       })
       .then(function (hasVoted) {
         // Do not allow a user to vote
+        console.log("hiii");
         if (hasVoted) {
           $("form").hide();
         }
+        
         loader.hide();
         content.show();
       })
       .catch(function (error) {
         console.warn(error);
+        console.log("Its an error");
       });
   },
 
